@@ -38,26 +38,35 @@ switch($cmd) {
 		my ($wwidth, $wheight) = getsize($winid);
 		print "Window Res: $wwidth x $wheight\n";
 	}
-	case 'top-left' {
-		$run = "xwit -id $winid -move " . OFFSET_LEFT . ' ' . OFFSET_TOP;
+	case 'mv-top-left' {
+		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
 	}
-	case 'top-right' {
+	case 'mv-top-right' {
 		my ($swidth, $sheight) = getres();
 		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . ' ' . OFFSET_TOP;
+		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
 	}
-	case 'bottom-left' {
+	case 'mv-bottom-left' {
 		my ($swidth, $sheight) = getres();
 		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . OFFSET_LEFT . ' ' . ($sheight - $wheight - OFFSET_BOTTOM);
+		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . ($sheight - $wheight - OFFSET_BOTTOM);
 	}
-	case 'bottom-right' {
+	case 'mv-bottom-right' {
 		my ($swidth, $sheight) = getres();
 		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . ' ' . ($sheight - $wheight - OFFSET_BOTTOM);
+		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
+	}
+	case 'mv-left' {
+		my ($swidth, $sheight) = getres();
+		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
+	}
+	case 'mv-right' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
 	}
 	else {
-		print "Unknown action: $cmd\n";
+		print "Unknown command: $cmd\n";
 	}
 }
 
