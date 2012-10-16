@@ -4,6 +4,7 @@
 package xthrow;
 use Switch;
 use constant {
+	DISPLAY => ':0.0',
 	OFFSET_LEFT => 5,
 	OFFSET_TOP => 46,
 	OFFSET_RIGHT => 2,
@@ -15,7 +16,8 @@ our $VERSION = '0.1.0';
 $cmd = shift;
 
 # Slurp the actively focused window ID from xprop
-($winid) = (`xprop -root` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
+my $xprop = "xprop -display " . DISPLAY . " -root";
+($winid) = (`$xprop` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
 
 sub getres {
 	# Returns ($width, $height) of the screen
@@ -71,6 +73,7 @@ switch($cmd) {
 }
 
 if ($run) { # Run something
+	$run = "DISPLAY=" . DISPLAY . " $run";
 	print "RUN [$run]";
 	exec($run);
 }
