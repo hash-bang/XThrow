@@ -2,6 +2,8 @@ XThrow is a handy script which throws the currently active window around the scr
 
 Its primary use is to be bound to your window managers shortcut keys and used to move the active window instead of using a mouse.
 
+This script was written originally as a drop-in alternative to the Compiz Put plugin which performs much the same functions.
+
 
 Command line reference
 ======================
