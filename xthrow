@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+# Requires: xprop, xwit
+
+package xthrow;
+use Switch;
+use constant {
+	OFFSET_LEFT => 5,
+	OFFSET_TOP => 46,
+	OFFSET_RIGHT => 2,
+	OFFSET_BOTTOM => 2,
+};
+use Data::Dumper;
+our $VERSION = '0.1.0';
+
+$cmd = shift;
+
+# Slurp the actively focused window ID from xprop
+($winid) = (`xprop -root` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
+
+sub getres {
+	# Returns ($width, $height) of the screen
+	return (`xrandr` =~ /^\s*([0-9]+)x([0-9]+)\s*/sm);
+}
+sub getsize {
+	# Returns ($width, $height) of the given $window_id
+	$winid = shift;
+	$info = `xwininfo -id $winid`;
+	my ($width) = ($info =~ /Width: ([0-9]+)/);
+	my ($height) = ($info =~ /Height: ([0-9]+)/);
+	return ($width, $height);
+}
+
+switch($cmd) {
+	case 'debug' {
+		print "Win ID: $winid\n";
+		my ($swidth, $sheight) = getres();
+		print "Screen Res: $swidth x $sheight\n";
+		my ($wwidth, $wheight) = getsize($winid);
+		print "Window Res: $wwidth x $wheight\n";
+	}
+	case 'top-left' {
+		$run = "xwit -id $winid -move " . OFFSET_LEFT . ' ' . OFFSET_TOP;
+	}
+	case 'top-right' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . ' ' . OFFSET_TOP;
+	}
+	case 'bottom-left' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -move " . OFFSET_LEFT . ' ' . ($sheight - $wheight - OFFSET_BOTTOM);
+	}
+	case 'bottom-right' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . ' ' . ($sheight - $wheight - OFFSET_BOTTOM);
+	}
+	else {
+		print "Unknown action: $cmd\n";
+	}
+}
+
+if ($run) { # Run something
+	print "RUN [$run]";
+	exec($run);
+}
