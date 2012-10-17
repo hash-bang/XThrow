@@ -42,9 +42,11 @@ Display various debugging information about the active window and the screen.
 
 XThrow requires a few external modules before it can work correctly. Follow the following stages to get everything working.
 
-	sudo apt-get install xwit x11-utils	
+	sudo apt-get install x11-utils libx11-guitest-perl
 
-... or whatever package manager your system supports.
+OR
+	
+	cpan libx11-guitest-perl
 
 =head1 BUGS
 
@@ -60,6 +62,7 @@ Matt Carter <m@ttcarter.com>
 # }}} POD
 
 package xthrow;
+use X11::GUITest qw/GetInputFocus GetWindowName GetWindowPos GetScreenRes MoveWindow ResizeWindow/;
 use Switch;
 use constant {
 	DISPLAY => ':0.0',
@@ -73,14 +76,9 @@ our $VERSION = '0.1.0';
 
 $cmd = shift;
 
-# Slurp the actively focused window ID from xprop
-my $xprop = "xprop -display " . DISPLAY . " -root";
-($winid) = (`$xprop` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
+# Slurp the actively focused window ID
+my $winid = GetInputFocus();
 
-sub getres {
-	# Returns ($width, $height) of the screen
-	return (`xrandr` =~ /^\s*([0-9]+)x([0-9]+)\s*/sm);
-}
 sub getsize {
 	# Returns ($width, $height) of the given $window_id
 	$winid = shift;
@@ -92,36 +90,41 @@ sub getsize {
 
 switch($cmd) {
 	case 'debug' {
-		print "Win ID: $winid\n";
-		my ($swidth, $sheight) = getres();
+		my ($swidth, $sheight) = GetScreenRes();
 		print "Screen Res: $swidth x $sheight\n";
-		my ($wwidth, $wheight) = getsize($winid);
+
+		my ($wx, $wy, $wwidth, $wheight, $wborder, $wscreen) = GetWindowPos($winid);
+		print "Win ID: $winid\n";
+		print "Window Name: " . GetWindowName($winid) . "\n";
+		print "Window Pos: $wx, $wy\n";
 		print "Window Res: $wwidth x $wheight\n";
+		print "Window Border: $wborder\n";
+		print "Window Screen: $wscreen\n";
 	}
 	case 'mv-top-left' {
-		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
+		print MoveWindow($winid, OFFSET_LEFT, OFFSET_TOP);
 	}
 	case 'mv-top-right' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
+		my ($swidth, $sheight) = GetScreenRes();
+		my ($wx, $wy, $wwidth, $wheight, $wborder, $wscreen) = GetWindowPos($winid);
 		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
 	}
 	case 'mv-bottom-left' {
-		my ($swidth, $sheight) = getres();
+		my ($swidth, $sheight) = GetScreenRes();
 		my ($wwidth, $wheight) = getsize($winid);
 		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . ($sheight - $wheight - OFFSET_BOTTOM);
 	}
 	case 'mv-bottom-right' {
-		my ($swidth, $sheight) = getres();
+		my ($swidth, $sheight) = GetScreenRes();
 		my ($wwidth, $wheight) = getsize($winid);
 		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
 	}
 	case 'mv-left' {
-		my ($swidth, $sheight) = getres();
+		my ($swidth, $sheight) = GetScreenRes();
 		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
 	}
 	case 'mv-right' {
-		my ($swidth, $sheight) = getres();
+		my ($swidth, $sheight) = GetScreenRes();
 		my ($wwidth, $wheight) = getsize($winid);
 		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
 	}
