@@ -63,8 +63,8 @@ package xthrow;
 use Switch;
 use constant {
 	DISPLAY => ':0.0',
-	OFFSET_LEFT => 5,
-	OFFSET_TOP => 46,
+	OFFSET_LEFT => 3,
+	OFFSET_TOP => 2,
 	OFFSET_RIGHT => 2,
 	OFFSET_BOTTOM => 2,
 };
