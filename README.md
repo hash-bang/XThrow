@@ -8,7 +8,6 @@ This script was written originally as a drop-in alternative to the Compiz Put pl
 Command line reference
 ======================
 ```
-<!-- POD -->
 NAME
     xthrow - Throw X windows around the screen
 
@@ -72,5 +71,4 @@ BUGS
 AUTHOR
     Matt Carter <m@ttcarter.com>
 
-<!-- END POD -->
 ```
