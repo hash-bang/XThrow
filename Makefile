@@ -6,7 +6,7 @@ DEBFACTORY := DebFactory
 all: README.md
 
 README.md: xthrow
-	pod2text xthrow | perl -e '$$_=join("",<>); s/(.*<!-- POD -->).*(<!-- END POD -->.*)/"$$1\n" . join("", <STDIN>) . $$2/es; print;' README.md >README.md.tmp
+	pod2text xthrow | perl -e '$$_=join("",<>); s/(.*```).*(```.*)/"$$1\n" . join("", <STDIN>) . $$2/es; print;' README.md >README.md.tmp
 	mv README.md.tmp README.md
 	git add README.md
 	git commit -m 'Auto update from POD'
