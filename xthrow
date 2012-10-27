@@ -62,6 +62,9 @@ Matt Carter <m@ttcarter.com>
 
 package xthrow;
 use Switch;
+use Data::Dumper;
+our $VERSION = '0.1.0';
+
 use constant {
 	DISPLAY => ':0.0',
 	DESKTOP_NAME => 'Desktop', # Match the desktop window by this string
@@ -72,8 +75,6 @@ my $offset_right = 2;
 my $offset_bottom = 0;
 my $offset_left = 2;
 
-use Data::Dumper;
-our $VERSION = '0.1.0';
 
 $cmd = shift;
 
