@@ -6,7 +6,7 @@ xthrow - Throw X windows around the screen
 
 =head1 SYNOPSIS
 
-	xthrow <command>
+	xthrow <command> [arguments]
 
 =over
 	
@@ -36,6 +36,18 @@ Unlike mv-left or mv-right this does not resize the window.
 =item B<debug>
 
 Display various debugging information about the active window and the screen.
+
+=back
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item B<-v>
+
+=item B<--verbose>
+
+Increase the verbosity of XThrow. This can show things such as externally executed programs.
 
 =back
 
