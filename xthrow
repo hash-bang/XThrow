@@ -14,6 +14,7 @@ xthrow - Throw X windows around the screen
 
 	xthrow mv-[left|right]
 	xthrow mv-[top|bottom]-[left|right]
+	xthrow mv-[center|top|right|bottom|left]
 	xthrow debug
 
 =back
@@ -27,9 +28,9 @@ xthrow - Throw X windows around the screen
 Move the active window to occupy the entire left or right side of the screen.
 The window will be resized to occupy half the screen width.
 
-=item B<mv-top-left, mv-top-right, mv-bottom-left, mv-bottom-right>
+=item B<mc-center, mv-top, mv-bottom, mv-top-left, mv-top-right, mv-bottom-left, mv-bottom-right>
 
-Move the active window to the top left, top right, bottom left or bottom right of the screen.
+Move the active window to the center, center top, center bottom, top left, top right, bottom left or bottom right of the screen.
 Unlike mv-left or mv-right this does not resize the window.
 
 =item B<debug>
@@ -116,9 +117,24 @@ switch($cmd) {
 		my ($wwidth, $wheight) = getsize($winid);
 		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
 	}
+	case 'mv-center' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -move " . (($swidth - $wwidth) /2) . " " . (($sheight - $wheight) /2);
+	}
+	case 'mv-top' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -move " . (($swidth - $wwidth) /2) . " 0";
+	}
 	case 'mv-left' {
 		my ($swidth, $sheight) = getres();
 		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
+	}
+	case 'mv-bottom' {
+		my ($swidth, $sheight) = getres();
+		my ($wwidth, $wheight) = getsize($winid);
+		$run = "xwit -id $winid -move " . (($swidth - $wwidth) /2) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
 	}
 	case 'mv-right' {
 		my ($swidth, $sheight) = getres();
