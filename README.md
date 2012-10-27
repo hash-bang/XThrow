@@ -27,7 +27,10 @@ COMMANDS
             of the screen. The window will be resized to occupy half the
             screen width.
 
-    mc-center, mv-top, mv-bottom, mv-top-left, mv-top-right, mv-bottom-left,
+            See --bias for information on biasing this amount of screen
+            space rather than using an even 50%/50% split.
+
+    mv-center, mv-top, mv-bottom, mv-top-left, mv-top-right, mv-bottom-left,
     mv-bottom-right
             Move the active window to the center, center top, center bottom,
             top left, top right, bottom left or bottom right of the screen.
@@ -37,6 +40,17 @@ COMMANDS
             and the screen.
 
 ARGUMENTS
+    -b
+    --bias  Bias the calculated width of the window to a percentage of the
+            screen width rather than the usual amount.
+
+            This can be used to favour one side of the screen (for example
+            if you prefer your workspace to the left or right of the screen
+            with minor windows on the opposit).
+
+            At present this argument only effects the mv-left and mv-right
+            commands.
+
     -v
     --verbose
             Increase the verbosity of XThrow. This can show things such as
