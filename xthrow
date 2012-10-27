@@ -43,7 +43,7 @@ Display various debugging information about the active window and the screen.
 
 XThrow requires a few external modules before it can work correctly. Follow the following stages to get everything working.
 
-	sudo apt-get install xwit x11-utils	
+	sudo apt-get install wmctrl
 
 ... or whatever package manager your system supports.
 
@@ -64,6 +64,7 @@ package xthrow;
 use Switch;
 use constant {
 	DISPLAY => ':0.0',
+	DESKTOP_NAME => 'Desktop', # Match the desktop window by this string
 	OFFSET_LEFT => 3,
 	OFFSET_TOP => 2,
 	OFFSET_RIGHT => 2,
@@ -78,68 +79,51 @@ $cmd = shift;
 my $xprop = "xprop -display " . DISPLAY . " -root";
 ($winid) = (`$xprop` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
 
-sub getres {
-	# Returns ($width, $height) of the screen
-	return (`xrandr` =~ /^\s*([0-9]+)x([0-9]+)\s*/sm);
-}
-sub getsize {
-	# Returns ($width, $height) of the given $window_id
-	$winid = shift;
-	$info = `xwininfo -id $winid`;
-	my ($width) = ($info =~ /Width: ([0-9]+)/);
-	my ($height) = ($info =~ /Height: ([0-9]+)/);
-	return ($width, $height);
+my ($wx, $wy, $wwidth, $wheight); # Window x,y,width,height
+my ($sx, $sy, $swidth, $sheight); # Desktop x,y,width,height
+
+$info = `wmctrl -G -l`; # Scrape wmctrl for window info
+for (split /\n/, $info) {
+	my @bits = split /\s+/;
+	if (hex($bits[0]) == hex($winid)) {
+		($junk,$junk,$wx,$wy,$wwidth,$wheight) = @bits;
+	} elsif ($bits[7] eq DESKTOP_NAME) {
+		($junk,$junk,$sx,$sy,$swidth,$sheight) = @bits;
+	}
 }
 
 switch($cmd) {
 	case 'debug' {
 		print "Win ID: $winid\n";
-		my ($swidth, $sheight) = getres();
-		print "Screen Res: $swidth x $sheight\n";
-		my ($wwidth, $wheight) = getsize($winid);
-		print "Window Res: $wwidth x $wheight\n";
+		print "Screen Pos: $sx, $sy / $swidth x $sheight\n";
+		print "Window Pos: $wx, $wy / $wwidth x $wheight\n";
 	}
 	case 'mv-top-left' {
-		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
+		$run = "wmctrl -i -r $winid -e 0," . OFFSET_LEFT . "," . OFFSET_TOP . ",$wwidth,$wheight";
 	}
 	case 'mv-top-right' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
+		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - OFFSET_RIGHT) . "," . OFFSET_TOP . ",$wwidth,$wheight";
 	}
 	case 'mv-bottom-left' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . ($sheight - $wheight - OFFSET_BOTTOM);
+		$run = "wmctrl -i -r $winid -e 0," . OFFSET_LEFT . "," . ($sheight - $wheight - OFFSET_BOTTOM) . ",$wwidth,$wheight";
 	}
 	case 'mv-bottom-right' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
+		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - OFFSET_RIGHT) . "," . ($sheight - $wheight - OFFSET_BOTTOM) . ",$wwidth,$wheight";
 	}
 	case 'mv-center' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . (($swidth - $wwidth) /2) . " " . (($sheight - $wheight) /2);
+		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . (($sheight - $wheight) /2) . ",$wwidth,$wheight";
 	}
 	case 'mv-top' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . (($swidth - $wwidth) /2) . " 0";
+		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . OFFSET_TOP . ",$wwidth,$wheight";
 	}
 	case 'mv-left' {
-		my ($swidth, $sheight) = getres();
-		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
+		$run = "wmctrl -i -r $winid -e 0," . OFFSET_LEFT . "," . OFFSET_TOP . "," . ($swidth/2) . "," . ($sheight - OFFSET_BOTTOM - OFFSET_TOP);
 	}
 	case 'mv-bottom' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . (($swidth - $wwidth) /2) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
+		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . ($sheight - $wheight - OFFSET_BOTTOM) . ",$wwidth,$wheight";
 	}
 	case 'mv-right' {
-		my ($swidth, $sheight) = getres();
-		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
+		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - OFFSET_RIGHT) . "," . OFFSET_TOP . "," . ($swidth/2) . "," . ($sheight - OFFSET_BOTTOM - OFFSET_TOP);
 	}
 	else {
 		print "Unknown command: $cmd\n";
