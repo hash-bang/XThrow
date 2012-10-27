@@ -102,31 +102,33 @@ switch($cmd) {
 		print "Window Screen: $wscreen\n";
 	}
 	case 'mv-top-left' {
-		print MoveWindow($winid, OFFSET_LEFT, OFFSET_TOP);
+		MoveWindow($winid, OFFSET_LEFT, OFFSET_TOP);
 	}
 	case 'mv-top-right' {
 		my ($swidth, $sheight) = GetScreenRes();
 		my ($wx, $wy, $wwidth, $wheight, $wborder, $wscreen) = GetWindowPos($winid);
-		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
+		MoveWindow($winid, $swidth - $wwidth - OFFSET_RIGHT, OFFSET_TOP);
 	}
 	case 'mv-bottom-left' {
 		my ($swidth, $sheight) = GetScreenRes();
 		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . OFFSET_LEFT . " " . ($sheight - $wheight - OFFSET_BOTTOM);
+		MoveWindow($winid, OFFSET_LEFT, $sheight - $wheight - OFFSET_BOTTOM);
 	}
 	case 'mv-bottom-right' {
 		my ($swidth, $sheight) = GetScreenRes();
 		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . ($sheight - $wheight - OFFSET_BOTTOM);
+		MoveWindow($winid, $swidth - $wwidth - OFFSET_RIGHT, $sheight - $wheight - OFFSET_BOTTOM);
 	}
 	case 'mv-left' {
 		my ($swidth, $sheight) = GetScreenRes();
-		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . OFFSET_LEFT . " " . OFFSET_TOP;
+		ResizeWindow($winid, $swidth / 2, $sheight - OFFSET_BOTTOM - OFFSET_TOP);
+		MoveWindow($winid, OFFSET_LEFT, OFFSET_TOP);
 	}
 	case 'mv-right' {
 		my ($swidth, $sheight) = GetScreenRes();
 		my ($wwidth, $wheight) = getsize($winid);
-		$run = "xwit -id $winid -resize " . ($swidth/2) . " " . ($sheight - OFFSET_BOTTOM - OFFSET_TOP) . " && xwit -id $winid -move " . ($swidth - $wwidth - OFFSET_RIGHT) . " " . OFFSET_TOP;
+		ResizeWindow($winid, $swidth / 2, $sheight - OFFSET_BOTTOM - OFFSET_TOP);
+		MoveWindow($winid, $swidth - $wwidth - OFFSET_RIGHT, OFFSET_TOP);
 	}
 	else {
 		print "Unknown command: $cmd\n";
