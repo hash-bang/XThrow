@@ -33,7 +33,8 @@ COMMANDS
     mv-bottom-right
             Move the active window to the center, center top, center bottom,
             top left, top right, bottom left or bottom right of the screen.
-            Unlike mv-left or mv-right this does not resize the window.
+            Unlike mv-left or mv-right this does not resize the window
+            unless the --bias operation is set.
 
     debug   Display various debugging information about the active window
             and the screen.
@@ -47,8 +48,9 @@ ARGUMENTS
             if you prefer your workspace to the left or right of the screen
             with minor windows on the opposit).
 
-            At present this argument only effects the mv-left and mv-right
-            commands.
+            In the case of the corner move functions (i.e.
+            mv-[top|bottom]-[left|right]) this function also resizes the
+            window to fit the maximum window area within the bias.
 
     -v
     --verbose
