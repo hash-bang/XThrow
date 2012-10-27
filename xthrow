@@ -80,6 +80,7 @@ my $offset_left = 2;
 # }}}
 
 # CLI argument processing {{{
+my $verbose = 0;
 GetOptions(
 	'verbose|v+' => \$verbose,
 );
@@ -157,6 +158,6 @@ switch($cmd) {
 
 if ($run) { # Run something
 	$run = "DISPLAY=" . DISPLAY . " $run";
-	print "RUN [$run]";
+	print "RUN [$run]" if $verbose;
 	exec($run);
 }
