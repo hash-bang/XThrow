@@ -13,7 +13,7 @@ NAME
     xthrow - Throw X windows around the screen
 
 SYNOPSIS
-            xthrow <command>
+            xthrow <command> [arguments]
 
     Command specific syntax:
                 xthrow mv-[left|right]
