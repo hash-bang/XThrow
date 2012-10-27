@@ -61,10 +61,13 @@ Matt Carter <m@ttcarter.com>
 # }}} POD
 
 package xthrow;
+use Getopt::Long;
 use Switch;
 use Data::Dumper;
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
+Getopt::Long::Configure('bundling', 'ignorecase_always', 'pass_through');
 
+# Set initial program constants & variables {{{
 use constant {
 	DISPLAY => ':0.0',
 	DESKTOP_NAME => 'Desktop', # Match the desktop window by this string
@@ -74,10 +77,16 @@ my $offset_top = 20;
 my $offset_right = 2;
 my $offset_bottom = 0;
 my $offset_left = 2;
+# }}}
 
-
+# CLI argument processing {{{
+GetOptions(
+	'verbose|v+' => \$verbose,
+);
 $cmd = shift;
+# }}}
 
+# Retrieve window / process / screen info {{{
 # Slurp the actively focused window ID from xprop
 my $xprop = "xprop -display " . DISPLAY . " -root";
 ($winid) = (`$xprop` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
@@ -98,10 +107,13 @@ for (split /\n/, $info) {
 
 $wcmd = `ps h -p $wpid -o '%a'`;
 chomp($wcmd);
+# }}}
 
+# Apply window rules {{{
 if ($wcmd =~ /^xfce4-terminal /) {
 	$offset_top = 46;
 }
+# }}}
 
 switch($cmd) {
 	case 'debug' {
