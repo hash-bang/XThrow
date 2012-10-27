@@ -65,11 +65,13 @@ use Switch;
 use constant {
 	DISPLAY => ':0.0',
 	DESKTOP_NAME => 'Desktop', # Match the desktop window by this string
-	OFFSET_LEFT => 3,
-	OFFSET_TOP => 2,
-	OFFSET_RIGHT => 2,
-	OFFSET_BOTTOM => 2,
 };
+
+my $offset_top = 20;
+my $offset_right = 2;
+my $offset_bottom = 0;
+my $offset_left = 2;
+
 use Data::Dumper;
 our $VERSION = '0.1.0';
 
@@ -79,51 +81,61 @@ $cmd = shift;
 my $xprop = "xprop -display " . DISPLAY . " -root";
 ($winid) = (`$xprop` =~ /_NET_ACTIVE_WINDOW.*? # ([0-9a-fx]+)/s);
 
+my ($wpid, $wcmd); # Window owner PID and command (i.e. progam name)
 my ($wx, $wy, $wwidth, $wheight); # Window x,y,width,height
 my ($sx, $sy, $swidth, $sheight); # Desktop x,y,width,height
 
-$info = `wmctrl -G -l`; # Scrape wmctrl for window info
+$info = `wmctrl -p -G -l`; # Scrape wmctrl for window info
 for (split /\n/, $info) {
 	my @bits = split /\s+/;
 	if (hex($bits[0]) == hex($winid)) {
-		($junk,$junk,$wx,$wy,$wwidth,$wheight) = @bits;
-	} elsif ($bits[7] eq DESKTOP_NAME) {
-		($junk,$junk,$sx,$sy,$swidth,$sheight) = @bits;
+		($junk,$junk,$wpid,$wx,$wy,$wwidth,$wheight) = @bits;
+	} elsif ($bits[8] eq DESKTOP_NAME) {
+		($junk,$junk,$junk,$sx,$sy,$swidth,$sheight) = @bits;
 	}
+}
+
+$wcmd = `ps h -p $wpid -o '%a'`;
+chomp($wcmd);
+
+if ($wcmd =~ /^xfce4-terminal /) {
+	$offset_top = 46;
 }
 
 switch($cmd) {
 	case 'debug' {
 		print "Win ID: $winid\n";
+		print "Win PID: $wpid\n";
+		print "Win CMD: $wcmd\n";
 		print "Screen Pos: $sx, $sy / $swidth x $sheight\n";
 		print "Window Pos: $wx, $wy / $wwidth x $wheight\n";
 	}
 	case 'mv-top-left' {
-		$run = "wmctrl -i -r $winid -e 0," . OFFSET_LEFT . "," . OFFSET_TOP . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0,$offset_left,$offset_top,$wwidth,$wheight";
 	}
 	case 'mv-top-right' {
-		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - OFFSET_RIGHT) . "," . OFFSET_TOP . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - $offset_right) . ",$offset_top,$wwidth,$wheight";
 	}
 	case 'mv-bottom-left' {
-		$run = "wmctrl -i -r $winid -e 0," . OFFSET_LEFT . "," . ($sheight - $wheight - OFFSET_BOTTOM) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0,$offset_left," . ($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
 	}
 	case 'mv-bottom-right' {
-		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - OFFSET_RIGHT) . "," . ($sheight - $wheight - OFFSET_BOTTOM) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - $offset_right) . "," . ($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
 	}
 	case 'mv-center' {
 		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . (($sheight - $wheight) /2) . ",$wwidth,$wheight";
 	}
 	case 'mv-top' {
-		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . OFFSET_TOP . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . ",$offset_top,$wwidth,$wheight";
 	}
 	case 'mv-left' {
-		$run = "wmctrl -i -r $winid -e 0," . OFFSET_LEFT . "," . OFFSET_TOP . "," . ($swidth/2) . "," . ($sheight - OFFSET_BOTTOM - OFFSET_TOP);
+		$run = "wmctrl -i -r $winid -e 0,$offset_left,$offset_top," . ($swidth/2) . "," . ($sheight - $offset_bottom - $offset_top);
 	}
 	case 'mv-bottom' {
-		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . ($sheight - $wheight - OFFSET_BOTTOM) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . ($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
 	}
 	case 'mv-right' {
-		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - OFFSET_RIGHT) . "," . OFFSET_TOP . "," . ($swidth/2) . "," . ($sheight - OFFSET_BOTTOM - OFFSET_TOP);
+		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - $offset_right) . ",$offset_top," . ($swidth/2) . "," . ($sheight - $offset_bottom - $offset_top);
 	}
 	else {
 		print "Unknown command: $cmd\n";
