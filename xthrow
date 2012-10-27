@@ -28,7 +28,9 @@ xthrow - Throw X windows around the screen
 Move the active window to occupy the entire left or right side of the screen.
 The window will be resized to occupy half the screen width.
 
-=item B<mc-center, mv-top, mv-bottom, mv-top-left, mv-top-right, mv-bottom-left, mv-bottom-right>
+See --bias for information on biasing this amount of screen space rather than using an even 50%/50% split.
+
+=item B<mv-center, mv-top, mv-bottom, mv-top-left, mv-top-right, mv-bottom-left, mv-bottom-right>
 
 Move the active window to the center, center top, center bottom, top left, top right, bottom left or bottom right of the screen.
 Unlike mv-left or mv-right this does not resize the window.
@@ -42,6 +44,16 @@ Display various debugging information about the active window and the screen.
 =head1 ARGUMENTS
 
 =over 8
+
+=item B<-b>
+
+=item B<--bias>
+
+Bias the calculated width of the window to a percentage of the screen width rather than the usual amount.
+
+This can be used to favour one side of the screen (for example if you prefer your workspace to the left or right of the screen with minor windows on the opposit).
+
+At present this argument only effects the mv-left and mv-right commands.
 
 =item B<-v>
 
@@ -89,12 +101,16 @@ my $offset_top = 20;
 my $offset_right = 2;
 my $offset_bottom = 0;
 my $offset_left = 2;
+my $bias_left = 0.7;
+my $bias_right = 0.3;
 # }}}
 
 # CLI argument processing {{{
 my $verbose = 0;
+my $bias;
 GetOptions(
 	'verbose|v+' => \$verbose,
+	'vias|b' => \$bias,
 );
 $cmd = shift;
 # }}}
@@ -140,28 +156,37 @@ switch($cmd) {
 		$run = "wmctrl -i -r $winid -e 0,$offset_left,$offset_top,$wwidth,$wheight";
 	}
 	case 'mv-top-right' {
-		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - $offset_right) . ",$offset_top,$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . int($swidth - $wwidth - $offset_right) . ",$offset_top,$wwidth,$wheight";
 	}
 	case 'mv-bottom-left' {
-		$run = "wmctrl -i -r $winid -e 0,$offset_left," . ($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0,$offset_left," . int($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
 	}
 	case 'mv-bottom-right' {
-		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - $offset_right) . "," . ($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . int($swidth - $wwidth - $offset_right) . "," . int($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
 	}
 	case 'mv-center' {
-		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . (($sheight - $wheight) /2) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . int(($swidth - $wwidth) /2) . "," . int(($sheight - $wheight) /2) . ",$wwidth,$wheight";
 	}
 	case 'mv-top' {
-		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . ",$offset_top,$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . int(($swidth - $wwidth) /2) . ",$offset_top,$wwidth,$wheight";
 	}
 	case 'mv-left' {
-		$run = "wmctrl -i -r $winid -e 0,$offset_left,$offset_top," . ($swidth/2) . "," . ($sheight - $offset_bottom - $offset_top);
+		if ($bias) {
+			$run = "wmctrl -i -r $winid -e 0,$offset_left,$offset_top," . int($swidth * $bias_left) . "," . int($sheight - $offset_bottom - $offset_top);
+		} else {
+			$run = "wmctrl -i -r $winid -e 0,$offset_left,$offset_top," . int($swidth/2) . "," . int($sheight - $offset_bottom - $offset_top);
+		}
 	}
 	case 'mv-bottom' {
-		$run = "wmctrl -i -r $winid -e 0," . (($swidth - $wwidth) /2) . "," . ($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
+		$run = "wmctrl -i -r $winid -e 0," . int(($swidth - $wwidth) /2) . "," . int($sheight - $wheight - $offset_bottom) . ",$wwidth,$wheight";
 	}
 	case 'mv-right' {
-		$run = "wmctrl -i -r $winid -e 0," . ($swidth - $wwidth - $offset_right) . ",$offset_top," . ($swidth/2) . "," . ($sheight - $offset_bottom - $offset_top);
+		my $neww = $bias ? int($swidth * $bias_right) : int($swidth / 2);
+		if ($bias) {
+			$run = "wmctrl -i -r $winid -e 0," . ($swidth - $neww - $offset_right) . ",$offset_top,$neww," . int($sheight - $offset_bottom - $offset_top);
+		} else {
+			$run = "wmctrl -i -r $winid -e 0," . ($swidth - $neww - $offset_right) . ",$offset_top,$neww," . int($sheight - $offset_bottom - $offset_top);
+		}
 	}
 	else {
 		print "Unknown command: $cmd\n";
@@ -170,6 +195,6 @@ switch($cmd) {
 
 if ($run) { # Run something
 	$run = "DISPLAY=" . DISPLAY . " $run";
-	print "RUN [$run]" if $verbose;
+	print "RUN [$run]\n" if $verbose;
 	exec($run);
 }
