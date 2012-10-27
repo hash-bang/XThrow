@@ -18,6 +18,7 @@ SYNOPSIS
     Command specific syntax:
                 xthrow mv-[left|right]
                 xthrow mv-[top|bottom]-[left|right]
+                xthrow mv-[center|top|right|bottom|left]
                 xthrow debug
 
 COMMANDS
@@ -26,19 +27,26 @@ COMMANDS
             of the screen. The window will be resized to occupy half the
             screen width.
 
-    mv-top-left, mv-top-right, mv-bottom-left, mv-bottom-right
-            Move the active window to the top left, top right, bottom left
-            or bottom right of the screen. Unlike mv-left or mv-right this
-            does not resize the window.
+    mc-center, mv-top, mv-bottom, mv-top-left, mv-top-right, mv-bottom-left,
+    mv-bottom-right
+            Move the active window to the center, center top, center bottom,
+            top left, top right, bottom left or bottom right of the screen.
+            Unlike mv-left or mv-right this does not resize the window.
 
     debug   Display various debugging information about the active window
             and the screen.
+
+ARGUMENTS
+    -v
+    --verbose
+            Increase the verbosity of XThrow. This can show things such as
+            externally executed programs.
 
 INSTALLATION
     XThrow requires a few external modules before it can work correctly.
     Follow the following stages to get everything working.
 
-            sudo apt-get install xwit x11-utils
+            sudo apt-get install wmctrl
 
     ... or whatever package manager your system supports.
 
