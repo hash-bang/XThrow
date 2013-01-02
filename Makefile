@@ -1,24 +1,35 @@
-VERSION := $(shell perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' vmm)
-DEBFACTORY := DebFactory
+SCRIPT := xthrow
+VERSION := $(shell perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' $(SCRIPT))
 
-.PHONY: README.md
+# Which directory path to use when creating the deb file
+DEBFACTORY := Distro/Deb
 
-all: README.md
+install: deb
+	dpkg -i $(SCRIPT)_$(VERSION).deb
 
-README.md: xthrow
-	pod2text xthrow | perl -e '$$_=join("",<>); s/(.*```).*(```.*)/"$$1\n" . join("", <STDIN>) . $$2/es; print;' README.md >README.md.tmp
+all: README.md deb
+
+README.md: $(SCRIPT)
+	pod2text $(SCRIPT) | perl -e '$$_=join("",<>); s/(.*```).*(```.*)/"$$1\n" . join("", <STDIN>) . $$2/es; print;' README.md >README.md.tmp
 	mv README.md.tmp README.md
 	git add README.md
 	git commit -m 'Auto update from POD'
 
-commit: README.md
-	-git commit -a
-
-push: commit
-	git push
-
 version:
-	echo "VERSION IS $(VERSION)"
+	@echo "Version $(VERSION)"
 
 clean:
+	-rm *.deb
+	-rm -r $(DEBFACTORY)
+
+deb:
+	-rm *.deb
+	mkdir $(DEBFACTORY)
+	mkdir -p $(DEBFACTORY)/usr/bin $(DEBFACTORY)/usr/share/man $(DEBFACTORY)/usr/share/doc/$(SCRIPT)
+	cp -a $(SCRIPT) $(DEBFACTORY)/usr/bin
+	cp -ar Distro/DEBIAN $(DEBFACTORY)
+	perl -pi -e 's/\$$VERSION/$(VERSION)/' $(DEBFACTORY)/DEBIAN/control
+	pod2man $(SCRIPT) $(DEBFACTORY)/usr/share/man/$(SCRIPT).1
+	gzip -f $(DEBFACTORY)/usr/share/man/$(SCRIPT).1
+	dpkg -b $(DEBFACTORY) $(SCRIPT)_$(VERSION).deb
 	-rm -r $(DEBFACTORY)

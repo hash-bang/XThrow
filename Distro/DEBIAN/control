@@ -1,0 +1,10 @@
+Package: xthrow
+Source: xthrow
+Version: $VERSION
+Architecture: all
+Maintainer: Matt Carter <m@ttcarter.com>
+Depends: perl (>= 5.10.0)
+Section: utils
+Priority: optional
+Homepage: https://github.com/hash-bang/XThrow
+Description: Move and resize X windows around the screen within a Linux window manager
