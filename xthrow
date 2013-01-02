@@ -139,8 +139,15 @@ chomp($wcmd);
 # }}}
 
 # Apply window rules {{{
-if ($wcmd =~ /^xfce4-terminal /) {
+if ($wcmd =~ /^xfce4-terminal/) {
 	$offset_top = 46;
+}
+if ($wcmd =~ /^mplayer/) {
+	$offset_top = 46;
+	$offset_bottom = 5;
+}
+if ($wcmd =~ /^pidgin/) {
+	$offset_bottom = 26;
 }
 # }}}
 
