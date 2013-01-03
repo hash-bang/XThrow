@@ -82,5 +82,7 @@ Alternatively merge the XFCE config file included in this directory (`xfce4-keyb
 
 	# Copy the config lines over that you want to keep
 
-	# Restart xfconfd so the keyboard settings are imported
+	# Now either restart XFCE or force the settings daemons to reload:
 	killall xfconfd
+	killall xfce4-settings-helper
+	xfce4-settings-helper
