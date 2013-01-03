@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-keyboard-shortcuts" version="1.0">
+  <property name="commands" type="empty">
+    <property name="custom" type="empty">
+      <property name="&lt;Super&gt;q" type="string" value="xthrow mv-top-left"/>
+      <property name="&lt;Super&gt;e" type="string" value="xthrow mv-top-right"/>
+      <property name="&lt;Super&gt;z" type="string" value="xthrow mv-bottom-left"/>
+      <property name="&lt;Super&gt;c" type="string" value="xthrow mv-bottom-right"/>
+      <property name="&lt;Super&gt;x" type="string" value="xthrow mv-bottom"/>
+      <property name="&lt;Super&gt;s" type="string" value="xthrow mv-center"/>
+      <property name="&lt;Super&gt;w" type="string" value="xthrow mv-top"/>
+      <property name="&lt;Super&gt;a" type="string" value="xthrow -b mv-left"/>
+      <property name="&lt;Super&gt;d" type="string" value="xthrow -b mv-right"/>
+      <property name="&lt;Alt&gt;&lt;Super&gt;q" type="string" value="xthrow -b mv-top-left"/>
+      <property name="&lt;Alt&gt;&lt;Super&gt;e" type="string" value="xthrow -b mv-top-right"/>
+      <property name="&lt;Alt&gt;&lt;Super&gt;z" type="string" value="xthrow -b mv-bottom-left"/>
+      <property name="&lt;Alt&gt;&lt;Super&gt;c" type="string" value="xthrow -b mv-bottom-right"/>
+    </property>
+  </property>
+</channel>

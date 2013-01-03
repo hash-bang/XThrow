@@ -4,6 +4,8 @@ Its primary use is to be bound to your window managers shortcut keys and used to
 
 This script was written originally as a drop-in alternative to the Compiz Put plugin which performs much the same functions.
 
+See the `examples` folder for an example keymap and ways to import it into various Window Managers.
+
 
 Command line reference
 ======================
