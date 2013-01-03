@@ -3,7 +3,7 @@ Source: xthrow
 Version: $VERSION
 Architecture: all
 Maintainer: Matt Carter <m@ttcarter.com>
-Depends: perl (>= 5.10.0)
+Depends: perl (>= 5.10.0), wmctrl
 Section: utils
 Priority: optional
 Homepage: https://github.com/hash-bang/XThrow
