@@ -4,7 +4,7 @@ VERSION := $(shell perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift
 # Which directory path to use when creating the deb file
 DEBFACTORY := Distro/Deb
 
-install: deb
+install:
 	dpkg -i $(SCRIPT)_$(VERSION).deb
 
 all: README.md deb
@@ -25,11 +25,11 @@ clean:
 deb:
 	-rm *.deb
 	mkdir $(DEBFACTORY)
-	mkdir -p $(DEBFACTORY)/usr/bin $(DEBFACTORY)/usr/share/man $(DEBFACTORY)/usr/share/doc/$(SCRIPT)
+	mkdir -p $(DEBFACTORY)/usr/bin $(DEBFACTORY)/usr/share/man/man1 $(DEBFACTORY)/usr/share/doc/$(SCRIPT)
 	cp -a $(SCRIPT) $(DEBFACTORY)/usr/bin
 	cp -ar Distro/DEBIAN $(DEBFACTORY)
 	perl -pi -e 's/\$$VERSION/$(VERSION)/' $(DEBFACTORY)/DEBIAN/control
-	pod2man $(SCRIPT) $(DEBFACTORY)/usr/share/man/$(SCRIPT).1
-	gzip -f $(DEBFACTORY)/usr/share/man/$(SCRIPT).1
+	pod2man $(SCRIPT) $(DEBFACTORY)/usr/share/man/man1/$(SCRIPT).1
+	gzip -f $(DEBFACTORY)/usr/share/man/man1/$(SCRIPT).1
 	dpkg -b $(DEBFACTORY) $(SCRIPT)_$(VERSION).deb
 	-rm -r $(DEBFACTORY)
