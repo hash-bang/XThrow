@@ -140,14 +140,13 @@ chomp($wcmd);
 
 # Apply window rules {{{
 if ($wcmd =~ /^xfce4-terminal/) {
-	$offset_top = 46;
-}
-if ($wcmd =~ /^mplayer/) {
-	$offset_top = 46;
-	$offset_bottom = 5;
-}
-if ($wcmd =~ /^pidgin/) {
-	$offset_bottom = 26;
+	($offset_top, $offset_right, $offset_bottom, $offset_left) = (46, 0, 0, 0);
+} elsif ($wcmd =~ /^terminology/) {
+	($offset_top, $offset_right, $offset_bottom, $offset_left) = (0, 8, 24, 0);
+} elsif ($wcmd =~ /^mplayer/) {
+	($offset_top, $offset_right, $offset_bottom, $offset_left) = (46, 0, 5, 0);
+} elsif ($wcmd =~ /^pidgin/) {
+	($offset_top, $offset_right, $offset_bottom, $offset_left) = (0, 0, 26, 0);
 }
 # }}}
 
@@ -156,6 +155,7 @@ switch($cmd) {
 		print "Win ID: $winid\n";
 		print "Win PID: $wpid\n";
 		print "Win CMD: $wcmd\n";
+		print "Offsets (clockwise): $offset_top, $offset_right, $offset_bottom, $offset_left\n";
 		print "Screen Pos: $sx, $sy / $swidth x $sheight\n";
 		print "Window Pos: $wx, $wy / $wwidth x $wheight\n";
 	}
