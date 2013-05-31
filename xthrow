@@ -147,6 +147,8 @@ if ($wcmd =~ /^xfce4-terminal/) {
 	($offset_top, $offset_right, $offset_bottom, $offset_left) = (46, 0, 5, 0);
 } elsif ($wcmd =~ /^pidgin/) {
 	($offset_top, $offset_right, $offset_bottom, $offset_left) = (0, 0, 26, 0);
+} elsif ($wcmd =~ /firefox/) {
+	($offset_top, $offset_right, $offset_bottom, $offset_left) = (0, 0, 45, 0);
 }
 # }}}
 
